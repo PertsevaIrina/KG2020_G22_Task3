@@ -1,8 +1,10 @@
 package ru.cs.vsu;
 
+import ru.cs.vsu.circledrawers.BresenhemCircleDrawer;
 import ru.cs.vsu.linedrawers.DDALineDrawer;
 import ru.cs.vsu.linedrawers.LineDrawer;
 import ru.cs.vsu.models.Line;
+import ru.cs.vsu.models.Sun;
 import ru.cs.vsu.pixeldrawers.BufferedImagePixelDrawer;
 import ru.cs.vsu.pixeldrawers.PixelDrawer;
 import ru.cs.vsu.points.RealPoint;
@@ -21,6 +23,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     );
     private Line xAxis = new Line(-2, 0, 2, 0);
     private Line yAxis = new Line(0, -2, 0, 2);
+    private Sun sun = new Sun(0, 0, 50, 2, 20);
 
     public DrawPanel() {
         this.addMouseMotionListener(this);
@@ -34,12 +37,14 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         Graphics2D bi_g = bi.createGraphics();
         PixelDrawer pd = new BufferedImagePixelDrawer(bi);
         LineDrawer ld = new DDALineDrawer(pd);
+        BresenhemCircleDrawer cd = new BresenhemCircleDrawer(pd);
         sc.setScreenH(getHeight());
         sc.setScreenW(getWidth());
         bi_g.fillRect(0, 0, getWidth(), getHeight());
         bi_g.setColor(Color.black);
         drawAxes(ld);
         drawAll(ld);
+        drawSun(cd, ld);
         if (currentLine != null) {
             drawLine(ld, currentLine);
         }
@@ -73,6 +78,31 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 //        }
 //
         drawAxes(ld);
+    }
+   /* public void drawSun(Graphics gr, Color color, int x, int y, int l, int r1, int r2) {
+        gr.setColor(color);
+        gr.fillOval(x - r1, y - r1, 2 * r1, 2 * r1);
+        double rad = 2 * Math.PI / l;
+        for (int i = 0; i < l; i++) {
+            double dx1 = r1 * Math.sin(rad * i);
+            double dy1 = r1 * Math.cos(rad * i);
+            double dy2 = r2 * Math.cos(rad * i);
+            gr.drawLine((int) dx1 + x, (int) dy1 + y, (int) dx2 + x, (int) dy2 + y);
+        }
+    }*/
+
+    private void drawSun(BresenhemCircleDrawer pd, LineDrawer ld) {
+        pd.drawCircle(sc.realToScreen(sun.getO()).getX(), sc.realToScreen(sun.getO()).getY(), (int) sun.getrOfSun());
+        double rad = 2 * Math.PI / sun.getL();
+        for (int i = 0; i < sun.getL(); i++) {
+            double dx1 = sun.getrOfSun() * Math.sin(rad * i);
+            double dy1 = sun.getrOfSun() * Math.cos(rad * i);
+            double dx2 = sun.getrOfRay() * Math.sin(rad * i);
+            double dy2 = sun.getrOfRay() * Math.cos(rad * i);
+            RealPoint realPoint_x = new RealPoint(dx1 - sun.getO().getX(), dy1 - sun.getO().getY());
+            RealPoint realPoint_y = new RealPoint(dx2 - sun.getO().getX(), dy2 - sun.getO().getY());
+            ld.drawLine(sc.realToScreen(realPoint_x), sc.realToScreen(realPoint_y));
+        }
     }
 
     private void drawAxes(LineDrawer ld) {
@@ -127,6 +157,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     }
 
     private Line currentLine = null;
+
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
@@ -164,7 +195,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     public void mouseWheelMoved(MouseWheelEvent e) {
         int clicks = e.getWheelRotation();
         double scale = 1;
-        double coef = clicks <= 0 ?  0.9 : 1.1;
+        double coef = clicks <= 0 ? 0.9 : 1.1;
         for (int i = 0; i < Math.abs(clicks); i++) {
             scale *= coef;
         }
