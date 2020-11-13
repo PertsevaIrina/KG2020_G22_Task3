@@ -1,5 +1,8 @@
 package ru.cs.vsu.circledrawers;
 
+import ru.cs.vsu.ScreenConvertor;
+import ru.cs.vsu.points.RealPoint;
+
 public interface CircleDrawer {
-    void drawCircle(int x, int y, int rOfSun);
+    void drawCircle(ScreenConvertor sc, RealPoint o, double rOfSun);
 }

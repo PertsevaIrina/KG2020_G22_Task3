@@ -19,11 +19,11 @@ import java.util.ArrayList;
 public class DrawPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
     private ArrayList<Line> lines = new ArrayList<>();
     private ScreenConvertor sc = new ScreenConvertor(
-            -2, 2, 4, 4, 800, 600
+            -2, 2, 4, 4, 600, 600
     );
     private Line xAxis = new Line(-2, 0, 2, 0);
     private Line yAxis = new Line(0, -2, 0, 2);
-    private Sun sun = new Sun(0, 0, 50, 2, 20);
+    private Sun sun = new Sun(0, 0, 1, 2, 20);
 
     public DrawPanel() {
         this.addMouseMotionListener(this);
@@ -44,7 +44,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         bi_g.setColor(Color.black);
         drawAxes(ld);
         drawAll(ld);
-        drawSun(cd, ld);
+        drawSun(cd, ld, sc);
         if (currentLine != null) {
             drawLine(ld, currentLine);
         }
@@ -91,16 +91,16 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
     }*/
 
-    private void drawSun(BresenhemCircleDrawer pd, LineDrawer ld) {
-        pd.drawCircle(sc.realToScreen(sun.getO()).getX(), sc.realToScreen(sun.getO()).getY(), (int) sun.getrOfSun());
+    private void drawSun(BresenhemCircleDrawer pd, LineDrawer ld, ScreenConvertor sc) {
+        pd.drawCircle(sc, sun.getO(), sun.getrOfSun());
         double rad = 2 * Math.PI / sun.getL();
-        for (int i = 0; i < sun.getL(); i++) {
+             for (int i = 0; i < sun.getL(); i++) {
             double dx1 = sun.getrOfSun() * Math.sin(rad * i);
             double dy1 = sun.getrOfSun() * Math.cos(rad * i);
             double dx2 = sun.getrOfRay() * Math.sin(rad * i);
             double dy2 = sun.getrOfRay() * Math.cos(rad * i);
-            RealPoint realPoint_x = new RealPoint(dx1 - sun.getO().getX(), dy1 - sun.getO().getY());
-            RealPoint realPoint_y = new RealPoint(dx2 - sun.getO().getX(), dy2 - sun.getO().getY());
+            RealPoint realPoint_x = new RealPoint(dx1 + sun.getO().getX(), dy1 + sun.getO().getY());
+            RealPoint realPoint_y = new RealPoint(dx2 + sun.getO().getX(), dy2 + sun.getO().getY());
             ld.drawLine(sc.realToScreen(realPoint_x), sc.realToScreen(realPoint_y));
         }
     }
