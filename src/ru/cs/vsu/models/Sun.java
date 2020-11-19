@@ -38,4 +38,10 @@ public class Sun {
     public int getL() {
         return l;
     }
+
+    public void setO(RealPoint o) {
+        this.o = o;
+    }
+
+
 }

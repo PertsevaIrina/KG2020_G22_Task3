@@ -19,11 +19,11 @@ import java.util.ArrayList;
 public class DrawPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
     private ArrayList<Line> lines = new ArrayList<>();
     private ScreenConvertor sc = new ScreenConvertor(
-            -2, 2, 4, 4, 600, 600
+            -2, 2, 4, 4, 800, 600
     );
     private Line xAxis = new Line(-2, 0, 2, 0);
-    private Line yAxis = new Line(0, -2, 0, 2);
-    private Sun sun = new Sun(0, 0, 1, 2, 20);
+    private Line yAxis = new Line(0, -4, 0, 4);
+    private Sun sun = new Sun(0, 0, 1, 1, 20);
 
     public DrawPanel() {
         this.addMouseMotionListener(this);
@@ -42,9 +42,9 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         sc.setScreenW(getWidth());
         bi_g.fillRect(0, 0, getWidth(), getHeight());
         bi_g.setColor(Color.black);
-        drawAxes(ld);
-        drawAll(ld);
-        drawSun(cd, ld, sc);
+//        drawAxes(ld);
+//        drawAll(ld);
+        drawSun(cd, ld, sc, sun);
         if (currentLine != null) {
             drawLine(ld, currentLine);
         }
@@ -91,17 +91,25 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
     }*/
 
-    private void drawSun(BresenhemCircleDrawer pd, LineDrawer ld, ScreenConvertor sc) {
-        pd.drawCircle(sc, sun.getO(), sun.getrOfSun());
+    private void drawSun(BresenhemCircleDrawer cd, LineDrawer ld, ScreenConvertor sc, Sun sun) {
+        ScreenPoint o_S = sc.r2s(sun.getO());
+        RealPoint r_R_point = new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY());
+        ScreenPoint r_S_point = sc.r2s(r_R_point);
+        int r_S = r_S_point.getX() - o_S.getX();
+
+        cd.drawCircle(sc, o_S, r_S);
+        cd.fillCircle(sc, ld, o_S, r_S);
+
         double rad = 2 * Math.PI / sun.getL();
-             for (int i = 0; i < sun.getL(); i++) {
-            double dx1 = sun.getrOfSun() * Math.sin(rad * i);
-            double dy1 = sun.getrOfSun() * Math.cos(rad * i);
-            double dx2 = sun.getrOfRay() * Math.sin(rad * i);
-            double dy2 = sun.getrOfRay() * Math.cos(rad * i);
-            RealPoint realPoint_x = new RealPoint(dx1 + sun.getO().getX(), dy1 + sun.getO().getY());
-            RealPoint realPoint_y = new RealPoint(dx2 + sun.getO().getX(), dy2 + sun.getO().getY());
-            ld.drawLine(sc.realToScreen(realPoint_x), sc.realToScreen(realPoint_y));
+        for (int i = 0; i < sun.getL(); i++) {
+            double dx1 = o_S.getX() * Math.sin(rad * i);
+            double dy1 = o_S.getY() * Math.cos(rad * i);
+            double dx2 = r_S * Math.sin(rad * i);
+            double dy2 = r_S * Math.cos(rad * i);
+            ScreenPoint screenPoint_x = new ScreenPoint((int) dx1 + o_S.getX(), (int) dy1 + o_S.getY());
+            ScreenPoint screenPoint_y = new ScreenPoint((int) dx2 + o_S.getX(), (int) dy2 + o_S.getY());
+            ld.drawLine(screenPoint_x, screenPoint_y);
+
         }
     }
 
@@ -128,16 +136,16 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     @Override
     public void mouseDragged(MouseEvent e) {
         ScreenPoint current = new ScreenPoint(e.getX(), e.getY());
-        moveScreen(e, current);
+        moveScreen(e, current, sun);
         if (currentLine != null) {
             currentLine.setP2(sc.s2r(current));
         }
         repaint();
     }
 
-    private void moveScreen(MouseEvent e, ScreenPoint current) {
+    private void moveScreen(MouseEvent e, ScreenPoint current, Sun sun) {
         ScreenPoint delta;
-
+        ScreenPoint o_S = sc.r2s(sun.getO());
         if (prevDrag != null) {
             delta = new ScreenPoint(
                     current.getX() - prevDrag.getX(),
@@ -145,14 +153,18 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
 
             RealPoint deltaReal = sc.s2r(delta);
-            RealPoint zeroReal = sc.s2r(new ScreenPoint(0, 0));
+            RealPoint zeroReal = sc.s2r(o_S);
             RealPoint vector = new RealPoint(
                     deltaReal.getX() - zeroReal.getX(),
                     deltaReal.getY() - zeroReal.getY()
             );
-            sc.setX(sc.getX() - vector.getX());
+
+//            sun.setO(new RealPoint(sun.getO().getX() - vector.getX(),
+//                    sun.getO().getY() - vector.getY()));
+            sun.setO(new RealPoint(sun.getO().getX() - vector.getX(), sun.getO().getY() - vector.getY()));
             sc.setY(sc.getY() - vector.getY());
             prevDrag = current;
+            repaint();
         }
     }
 
@@ -160,6 +172,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mousePressed(MouseEvent e) {
+        ScreenPoint o_S = sc.r2s(sun.getO());
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = new ScreenPoint(e.getX(), e.getY());
         } else if (e.getButton() == MouseEvent.BUTTON1) {
@@ -203,4 +216,19 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         sc.setH(sc.getH() * scale);
         repaint();
     }
+//    @Override
+//    public void mouseWheelMoved(MouseWheelEvent e) {
+//        int clicks = e.getWheelRotation();
+//        double scale = 1;
+//        double coef = clicks > 0 ? 0.9 : 1.1;
+//        for (int i = 0; i < Math.abs(clicks); i++) {
+//            scale *= coef;
+//        }
+//        sc.setW(sc.getW() * scale);
+//        sc.setH(sc.getH() * scale);
+//        double r = (sun.getrOfSun() / scale);
+//            sun.setrOfSun(r);
+//        repaint();
+//    }
+
 }

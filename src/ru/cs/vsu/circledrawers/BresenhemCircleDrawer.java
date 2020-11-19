@@ -2,20 +2,21 @@ package ru.cs.vsu.circledrawers;
 
 import ru.cs.vsu.ScreenConvertor;
 import ru.cs.vsu.linedrawers.DDALineDrawer;
+import ru.cs.vsu.linedrawers.LineDrawer;
 import ru.cs.vsu.pixeldrawers.PixelDrawer;
 import ru.cs.vsu.points.RealPoint;
 import ru.cs.vsu.points.ScreenPoint;
 
 import java.awt.*;
 
-public class BresenhemCircleDrawer  implements CircleDrawer {
-        private PixelDrawer pd;
+public class BresenhemCircleDrawer implements CircleDrawer {
+    private PixelDrawer pd;
 
     public BresenhemCircleDrawer(PixelDrawer pd) {
         this.pd = pd;
     }
 
-//    @Override
+    //    @Override
 //        public void drawCircle(ScreenConvertor sc,RealPoint o, double rOfSun) {
 //            double x1 = 0, y1 = rOfSun, gap = 0, delta = (2 - 2 * rOfSun);
 //            while (y1 >= 0) {
@@ -44,16 +45,32 @@ public class BresenhemCircleDrawer  implements CircleDrawer {
 //            }
 //        }
     @Override
-public void drawCircle(ScreenConvertor sc, RealPoint center, double rOfSun) {
+    public void drawCircle(ScreenConvertor sc, ScreenPoint o, int rOfSun) {
+        double step = sc.getH() / 40000;
+        for (double i = 0; i < 2 * Math.PI; i += step) {
+            double x = o.getX() + rOfSun * Math.cos(i);
+            double y = o.getY() + rOfSun * Math.sin(i);
+//            int intx = (int) x;
+//            intx += x - intx > 0.5 ? 1 : 0;
+//            int inty = (int) y;
+//            intx += y - inty > 0.5 ? 1 : 0;
+//            ScreenPoint p = sc.r2s(new RealPoint(x, y));
+            pd.setPixel((int) x, (int) y, Color.ORANGE);
 
-    double step = sc.getH() / 40000;
-    for (double i = 0; i < 2 * Math.PI; i += step) {
-        double x = center.getX() + rOfSun * Math.cos(i);
-        double y = center.getY() + rOfSun * Math.sin(i);
-        ScreenPoint p = sc.r2s(new RealPoint(x, y));
-        pd.setPixel(p.getX(), p.getY(), Color.ORANGE);
-
+        }
     }
-}
-public void fillCircle (ScreenConvertor sc, DDALineDrawer ld,)
+
+    public void fillCircle(ScreenConvertor sc, LineDrawer ld, ScreenPoint o, int rOfSun) {
+        double step = sc.getH() / 40000;
+        for (double i = 0; i < 2 * Math.PI; i += step) {
+            double x = o.getX() + rOfSun * Math.cos(i);
+            double y = o.getY() + rOfSun * Math.sin(i);
+//            int intx = (int) x;
+//            intx += x - intx > 0.5 ? 1 : 0;
+//            int inty = (int) y;
+//            intx += y - inty > 0.5 ? 1 : 0;
+            ScreenPoint p = new ScreenPoint((int) x, (int) y);
+            ld.drawLine(p, o);
+        }
+    }
 }
