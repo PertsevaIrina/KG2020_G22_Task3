@@ -44,21 +44,46 @@ public class BresenhemCircleDrawer implements CircleDrawer {
 //                y1--;
 //            }
 //        }
-    @Override
-    public void drawCircle(ScreenConvertor sc, ScreenPoint o, int rOfSun) {
-        double step = sc.getH() / 40000;
-        for (double i = 0; i < 2 * Math.PI; i += step) {
-            double x = o.getX() + rOfSun * Math.cos(i);
-            double y = o.getY() + rOfSun * Math.sin(i);
-//            int intx = (int) x;
-//            intx += x - intx > 0.5 ? 1 : 0;
-//            int inty = (int) y;
-//            intx += y - inty > 0.5 ? 1 : 0;
-//            ScreenPoint p = sc.r2s(new RealPoint(x, y));
-            pd.setPixel((int) x, (int) y, Color.ORANGE);
 
+    @Override
+    public void drawCircle(ScreenConvertor sc, PixelDrawer pd, ScreenPoint o, int rOfSun) {
+        int x1 = rOfSun;
+        int y1 = 0;
+        int radiusError = 1;
+        while (x1 >= y1) {
+            pd.setPixel(x1 + o.getX(), y1 + o.getY(), Color.BLACK);
+            pd.setPixel(y1 + o.getX(), x1 + o.getY(), Color.BLACK);
+            pd.setPixel(-x1 + o.getX(), y1 + o.getY(), Color.BLACK);
+            pd.setPixel(-y1 + o.getX(), x1 + o.getY(), Color.BLACK);
+            pd.setPixel(-x1 + o.getX(), -y1 + o.getY(), Color.BLACK);
+            pd.setPixel(-y1 + o.getX(), -x1 + o.getY(), Color.BLACK);
+            pd.setPixel(x1 + o.getX(), -y1 + o.getY(), Color.BLACK);
+            pd.setPixel(y1 + o.getX(), -x1 + o.getY(), Color.BLACK);
+            y1++;
+            if (radiusError < 0) {
+                radiusError += 2 * y1 + 1;
+            } else {
+                x1--;
+                radiusError += 2 * (y1 - x1 + 1);
+            }
         }
     }
+
+//    @Override
+//    public void drawCircle(ScreenConvertor sc, ScreenPoint o, int rOfSun) {
+//        double step = sc.getH() / 40000;
+//        for (double i = 0; i < 2 * Math.PI; i += step) {
+//            double x = o.getX() + rOfSun * Math.cos(i);
+//            double y = o.getY() + rOfSun * Math.sin(i);
+////            int intx = (int) x;
+////            intx += x - intx > 0.5 ? 1 : 0;
+////            int inty = (int) y;
+////            intx += y - inty > 0.5 ? 1 : 0;
+////            ScreenPoint p = sc.r2s(new RealPoint(x, y));
+//            pd.setPixel((int) x, (int) y, Color.ORANGE);
+//
+//        }
+//    }
 
     public void fillCircle(ScreenConvertor sc, LineDrawer ld, ScreenPoint o, int rOfSun) {
         double step = sc.getH() / 40000;

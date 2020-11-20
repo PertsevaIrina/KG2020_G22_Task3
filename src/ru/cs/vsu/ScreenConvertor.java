@@ -1,5 +1,6 @@
 package ru.cs.vsu;
 
+import ru.cs.vsu.models.Sun;
 import ru.cs.vsu.points.RealPoint;
 import ru.cs.vsu.points.ScreenPoint;
 
