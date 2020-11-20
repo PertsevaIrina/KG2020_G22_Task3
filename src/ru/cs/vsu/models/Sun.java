@@ -26,6 +26,13 @@ public class Sun {
         return o;
     }
 
+    public void setrOfSun(double rOfSun) {
+        this.rOfSun = rOfSun;
+    }
+
+    public void setrOfRay(double rOfRay) {
+        this.rOfRay = rOfRay;
+    }
 
     public double getrOfSun() {
         return rOfSun;
