@@ -113,7 +113,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 //            RealPoint realPoint_y = new RealPoint(dx2 + sun.getO().getX(), dy2 + sun.getO().getY());
 //            ld.drawLine(sc.realToScreen(realPoint_x), sc.realToScreen(realPoint_y));
 //        }
-//        cd.fillCircle(sc, ld, o_S, r_S);
+        cd.fillCircle(sc, ld, o_S, rs_S);
 
         double rad = 2 * Math.PI / sun.getL();
         for (int i = 0; i < sun.getL(); i++) {
@@ -123,7 +123,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
             double dy2 = rr_R * Math.cos(rad * i);
             ScreenPoint screenPoint_x = new ScreenPoint((int) dx1 + o_S.getX(), (int) dy1 + o_S.getY());
             ScreenPoint screenPoint_y = new ScreenPoint((int) dx2 + o_S.getX(), (int) dy2 + o_S.getY());
-            ld.drawLine(screenPoint_x, screenPoint_y);
+            ld.drawLine(o_S, screenPoint_y);
 
         }
     }
