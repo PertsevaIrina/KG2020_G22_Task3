@@ -24,7 +24,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     );
     private Line xAxis = new Line(-4, 0, 4, 0);
     private Line yAxis = new Line(0, -4, 0, 4);
-    private Sun sun = new Sun(2, 2, 1, 2, 20);
+    private Sun sun = new Sun(0, 0, 1, 2, 20);
 //    private Sun sun1 = new Sun(-2, -2, 1, 2, 20);
 
     public DrawPanel() {
@@ -56,7 +56,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     }
 
     private void drawLine(LineDrawer ld, Line l) {
-        ld.drawLine(sc.r2s(l.getP1()), sc.r2s(l.getP2()));
+        ld.drawLine(sc.r2s(l.getP1()), sc.r2s(l.getP2()), Color.ORANGE);
     }
 
     private void drawAll(LineDrawer ld) {
@@ -105,7 +105,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         ScreenPoint rr_S_point = sc.r2s(rr_R_point);
         int rr_R = rr_S_point.getX() - o_S.getX();
 
-        cd.drawCircle(sc, pd, o_S, rs_S);
+        cd.drawCircle(sc, pd, o_S, rs_S,Color.ORANGE);
 //        double rad = 2 * Math.PI / sun.getL();
 //        for (int i = 0; i < sun.getL(); i++) {
 //            double dx1 = sun.getrOfSun() * Math.sin(rad * i);
@@ -116,7 +116,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 //            RealPoint realPoint_y = new RealPoint(dx2 + sun.getO().getX(), dy2 + sun.getO().getY());
 //            ld.drawLine(sc.realToScreen(realPoint_x), sc.realToScreen(realPoint_y));
 //        }
-        cd.fillCircle(sc, ld, o_S, rs_S);
+        cd.fillCircle(sc, ld, o_S, rs_S,Color.ORANGE);
 
         double rad = 2 * Math.PI / sun.getL();
         for (int i = 0; i < sun.getL(); i++) {
@@ -126,7 +126,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
             double dy2 = rr_R * Math.cos(rad * i);
             ScreenPoint screenPoint_x = new ScreenPoint((int) dx1 + o_S.getX(), (int) dy1 + o_S.getY());
             ScreenPoint screenPoint_y = new ScreenPoint((int) dx2 + o_S.getX(), (int) dy2 + o_S.getY());
-            ld.drawLine(o_S, screenPoint_y);
+            ld.drawLine(o_S, screenPoint_y, Color.ORANGE);
 
         }
     }
@@ -137,14 +137,14 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
             RealPoint p2 = new RealPoint(sun.getO().getX() - sun.getrOfSun(), sun.getO().getY() + sun.getrOfSun());
             RealPoint p3 = new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY() - sun.getrOfSun());
             RealPoint p4 = new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY() + sun.getrOfSun());
-            ld.drawLine(sc.r2s(p1), sc.r2s(p2));
-            ld.drawLine(sc.r2s(p2), sc.r2s(p4));
-            ld.drawLine(sc.r2s(p3), sc.r2s(p4));
-            ld.drawLine(sc.r2s(p3), sc.r2s(p1));
-            cd.drawCircle(sc, pd, sc.r2s(p1), 5);
-            cd.drawCircle(sc, pd, sc.r2s(p2), 5);
-            cd.drawCircle(sc, pd, sc.r2s(p3), 5);
-            cd.drawCircle(sc, pd, sc.r2s(p4), 5);
+            ld.drawLine(sc.r2s(p1), sc.r2s(p2), Color.GRAY);
+            ld.drawLine(sc.r2s(p2), sc.r2s(p4),Color.GRAY );
+            ld.drawLine(sc.r2s(p3), sc.r2s(p4), Color.GRAY);
+            ld.drawLine(sc.r2s(p3), sc.r2s(p1), Color.GRAY);
+            cd.drawCircle(sc, pd, sc.r2s(p1), 5,Color.BLUE);
+            cd.drawCircle(sc, pd, sc.r2s(p2), 5,Color.BLUE);
+            cd.drawCircle(sc, pd, sc.r2s(p3), 5,Color.BLUE);
+            cd.drawCircle(sc, pd, sc.r2s(p4), 5,Color.BLUE);
 
 
         }
@@ -152,11 +152,11 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
 
     private void drawAxes(LineDrawer ld) {
-        ld.drawLine(sc.realToScreen(xAxis.getP1()), sc.realToScreen(xAxis.getP2()));
-        ld.drawLine(sc.realToScreen(yAxis.getP1()), sc.realToScreen(yAxis.getP2()));
+        ld.drawLine(sc.realToScreen(xAxis.getP1()), sc.realToScreen(xAxis.getP2()), Color.black);
+        ld.drawLine(sc.realToScreen(yAxis.getP1()), sc.realToScreen(yAxis.getP2()), Color.black);
         for (Line l : lines) {
             ld.drawLine(sc.realToScreen(l.getP1()),
-                    sc.realToScreen(l.getP2()));
+                    sc.realToScreen(l.getP2()), Color.black);
         }
     }
 

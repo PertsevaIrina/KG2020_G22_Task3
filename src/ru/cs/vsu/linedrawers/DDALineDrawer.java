@@ -13,7 +13,7 @@ public class DDALineDrawer implements LineDrawer {
     }
 
     @Override
-    public void drawLine(ScreenPoint p1, ScreenPoint p2) {
+    public void drawLine(ScreenPoint p1, ScreenPoint p2, Color c) {
         int x2 = p2.getX();
         int x1 = p1.getX();
         int y2 = p2.getY();
@@ -29,7 +29,7 @@ public class DDALineDrawer implements LineDrawer {
             double k = dy / dx;
             for (int j = x1; j <= x2; j++) {
                 double i = k * (j - x1) + y1;
-                pd.setPixel(j, (int) i, Color.ORANGE);
+                pd.setPixel(j, (int) i, c);
             }
         } else {
             if (y1 > y2) {
@@ -39,7 +39,7 @@ public class DDALineDrawer implements LineDrawer {
             double kObr = dx / dy;
             for (int i = y1; i <= y2; i++) {
                 double j = kObr * (i - y1) + x1;
-                pd.setPixel((int) j, i, Color.ORANGE);
+                pd.setPixel((int) j, i, c);
             }
         }
     }
