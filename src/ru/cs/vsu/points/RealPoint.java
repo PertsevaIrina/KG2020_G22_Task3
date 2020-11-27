@@ -15,4 +15,5 @@ public class RealPoint {
     public double getY() {
         return y;
     }
+
 }
