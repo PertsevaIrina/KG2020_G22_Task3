@@ -46,10 +46,8 @@ public class Sun {
         return l;
     }
 
-    public RealPoint setO(double x, double y) {
-
-        return  new RealPoint(x,y);
-
+    public void setO(double x, double y) {
+        this.o = new RealPoint(x,y);
     }
 
 

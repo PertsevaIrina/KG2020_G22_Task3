@@ -22,14 +22,12 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class DrawPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
-    private ArrayList<Line> lines = new ArrayList<>();
     private ScreenConvertor sc = new ScreenConvertor(
             -4, 4, 8, 8, 600, 600
     );
-    private Line xAxis = new Line(-4, 0, 4, 0);
-    private Line yAxis = new Line(0, -4, 0, 4);
     private Sun sun = new Sun(0, 0, 1, 2, 20);
-//    private Sun sun1 = new Sun(-2, -2, 1, 2, 20);
+    private Sun sun1 = new Sun(-2, -2, 1, 2, 20);
+    private List<Sun> listOfSuns = new ArrayList<>();
 
     public DrawPanel() {
         this.addMouseMotionListener(this);
@@ -43,15 +41,18 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         Graphics2D bi_g = bi.createGraphics();
         PixelDrawer pd = new BufferedImagePixelDrawer(bi);
         LineDrawer ld = new DDALineDrawer(pd);
-        Graphics2D gr = (Graphics2D) g;
         BresenhemCircleDrawer cd = new BresenhemCircleDrawer(pd);
         sc.setScreenH(getHeight());
         sc.setScreenW(getWidth());
         bi_g.fillRect(0, 0, getWidth(), getHeight());
         bi_g.setColor(Color.black);
-//        drawAxes(ld);
-//        drawAll(ld);
-        drawSun(cd, pd, ld, sc, sun);
+
+        drawSun(cd, pd, ld, sc, sun, bi_g);
+        drawSun(cd, pd, ld, sc, sun1, bi_g);
+//        for (int i = 0; i <listOfSuns.size() - 1; i++) {
+//            drawSun(cd, pd, ld, sc, listOfSuns.get(i), bi_g);
+//        }
+
         drawSquareOfSun(cd, ld, pd);
 
 
@@ -67,7 +68,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     }
 
 
-    private void drawSun(BresenhemCircleDrawer cd, PixelDrawer pd, LineDrawer ld, ScreenConvertor sc, Sun sun) {
+    private void drawSun(BresenhemCircleDrawer cd, PixelDrawer pd, LineDrawer ld, ScreenConvertor sc, Sun sun, Graphics2D bi_g) {
         ScreenPoint o_S = sc.r2s(sun.getO());
 
         RealPoint rs_R_point = new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY());
@@ -78,8 +79,10 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         ScreenPoint rr_S_point = sc.r2s(rr_R_point);
         int rr_R = rr_S_point.getX() - o_S.getX();
 
-        cd.drawCircle(pd, o_S, rs_S, Color.ORANGE);
-        cd.fillCircle(sc, ld, o_S, rs_S, Color.ORANGE);
+        bi_g.setColor(Color.ORANGE);
+        bi_g.fillOval(o_S.getX() - rs_S, o_S.getY() - rs_S, rs_S * 2, rs_S * 2);
+//        cd.drawCircle(pd, o_S, rs_S, Color.ORANGE);
+//        cd.fillCircle(sc, ld, o_S, rs_S, Color.ORANGE);
 
         List<RealPoint> listPointOfRay = getListPointOfRay(sun);
         for (int i = 0; i < listPointOfRay.size(); i++) {
@@ -130,18 +133,9 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
     }
 
-
-    private void drawAxes(LineDrawer ld) {
-        ld.drawLine(sc.realToScreen(xAxis.getP1()), sc.realToScreen(xAxis.getP2()), Color.black);
-        ld.drawLine(sc.realToScreen(yAxis.getP1()), sc.realToScreen(yAxis.getP2()), Color.black);
-        for (Line l : lines) {
-            ld.drawLine(sc.realToScreen(l.getP1()),
-                    sc.realToScreen(l.getP2()), Color.black);
-        }
-    }
-
     private Line currentLine = null;
     private RealPoint clickedMarker = null;
+    private int markerId = -1;
     private boolean isSelected = false;
     private ScreenPoint prevDrag;
 
@@ -159,36 +153,20 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseDragged(MouseEvent e) {
-
         ScreenPoint current = new ScreenPoint(e.getX(), e.getY());
         RealPoint realCurrent = sc.s2r(current);
         ScreenPoint oS = sc.r2s(sun.getO());
-        if (clickedMarker == sun.getO()) {
-            sun.setO(realCurrent.getX(), realCurrent.getY());
-            System.out.println("хей");
-        } else
-        if (clickedMarker != null && clickedMarker != sun.getO()) {
+        RealPoint center;
+        if (markerId == 0) {
+            center = sc.s2r(new ScreenPoint(e.getXOnScreen() - 7,
+                    e.getYOnScreen() - 28));
+            sun.setO(center.getX(), center.getY());
+        } else if (markerId == 1) {
             sun.setrOfSun(Math.sqrt(Math.pow(sun.getO().getX() - realCurrent.getX(), 2)
-                    + Math.pow(sun.getO().getY() - realCurrent.getY(), 2)) - sun.getrOfSun()/3);
-//////            if(Math.abs(realCurrent.getX()) > Math.abs(clickedMarker.getX())){
-//////                sun.setrOfSun(sun.getrOfSun() + Math.sqrt(Math.pow(realCurrent.getX() - clickedMarker.getX(), 2)
-//////                        + Math.pow(realCurrent.getY() - clickedMarker.getY(), 2)));
-//////            } else{
-//////                sun.setrOfSun(sun.getrOfSun() - Math.sqrt(Math.pow(realCurrent.getX() - clickedMarker.getX(), 2)
-//////                        + Math.pow(realCurrent.getY() - clickedMarker.getY(), 2)));
-//////            }
-////
-//////            sun.setrOfSun(Math.sqrt(Math.pow(realCurrent.getX() - sun.getO().getX(), 2) + Math.pow(realCurrent.getY() - sun.getO().getY(), 2)));
-//////            RealPoint newR = new RealPoint(Math.abs(realCurrent.getX() - clickedMarker.getX()), Math.abs(realCurrent.getY() - clickedMarker.getY()));
-//////            sun.setrOfSun(sun.getrOfSun() + Math.abs (realCurrent.getX() - clickedMarker.getX()));
-//
+                    + Math.pow(sun.getO().getY() - realCurrent.getY(), 2)) - 9 * sun.getrOfSun() / 20);
         } else {
             moveScreen(e, current);
         }
-
-//        if (currentLine != null) {
-//            currentLine.setP2(sc.s2r(current));
-//        }
         repaint();
     }
 
@@ -200,8 +178,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
             prevDrag = null;
         } else if (e.getButton() == MouseEvent.BUTTON1) {
             clickedMarker = null;
-//            lines.add(currentLine);
-//            currentLine = null;
+            markerId = -1;
         }
         repaint();
     }
@@ -214,7 +191,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
         } else if (e.getButton() == MouseEvent.BUTTON1) {
             clickedMarker = getMarker(new ScreenPoint(e.getX(), e.getY()));
-            System.out.println(clickedMarker.getX() + " " + clickedMarker.getY());
+            markerId = getMarkerId(new ScreenPoint(e.getX(), e.getY()));
         }
 
         repaint();
@@ -243,16 +220,35 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     }
 
 
+    private int getMarkerId(ScreenPoint screenPoint) {
+        ScreenPoint p1S = sc.r2s(new RealPoint(sun.getO().getX() - sun.getrOfSun(), sun.getO().getY() - sun.getrOfSun()));
+        ScreenPoint p2S = sc.r2s(new RealPoint(sun.getO().getX() - sun.getrOfSun(), sun.getO().getY() + sun.getrOfSun()));
+        ScreenPoint p3S = sc.r2s(new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY() - sun.getrOfSun()));
+        ScreenPoint p4S = sc.r2s(new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY() + sun.getrOfSun()));
+
+        ScreenPoint oScreen = sc.r2s(sun.getO());
+
+        if (Math.abs(p1S.getX() - screenPoint.getX()) < 4 && Math.abs(p1S.getY() - screenPoint.getY()) < 4) {
+            return 1;
+        } else if (Math.abs(p2S.getX() - screenPoint.getX()) < 4 && Math.abs(p2S.getY() - screenPoint.getY()) < 4) {
+            return 1;
+        } else if (Math.abs(p3S.getX() - screenPoint.getX()) < 4 && Math.abs(p3S.getY() - screenPoint.getY()) < 4) {
+            return 1;
+        } else if (Math.abs(p4S.getX() - screenPoint.getX()) < 4 && Math.abs(p4S.getY() - screenPoint.getY()) < 4) {
+            return 1;
+        } else if (Math.abs(oScreen.getX() - screenPoint.getX()) < 4 && Math.abs(oScreen.getY() - screenPoint.getY()) < 4) {
+            return 0;
+        } else return -1;
+    }
 
     private RealPoint getMarker(ScreenPoint screenPoint) {
         ScreenPoint p1S = sc.r2s(new RealPoint(sun.getO().getX() - sun.getrOfSun(), sun.getO().getY() - sun.getrOfSun()));
         ScreenPoint p2S = sc.r2s(new RealPoint(sun.getO().getX() - sun.getrOfSun(), sun.getO().getY() + sun.getrOfSun()));
         ScreenPoint p3S = sc.r2s(new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY() - sun.getrOfSun()));
         ScreenPoint p4S = sc.r2s(new RealPoint(sun.getO().getX() + sun.getrOfSun(), sun.getO().getY() + sun.getrOfSun()));
+
         ScreenPoint oScreen = sc.r2s(sun.getO());
-//        if ( Math.abs(oScreen.getX() - screenPoint.getX()) < 10 && Math.abs(oScreen.getY() - screenPoint.getY()) < 10) {
-//            return sun.getO();
-//        } else
+
         if (Math.abs(p1S.getX() - screenPoint.getX()) < 4 && Math.abs(p1S.getY() - screenPoint.getY()) < 4) {
             return sc.s2r(p1S);
         } else if (Math.abs(p2S.getX() - screenPoint.getX()) < 4 && Math.abs(p2S.getY() - screenPoint.getY()) < 4) {
@@ -261,9 +257,9 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
             return sc.s2r(p3S);
         } else if (Math.abs(p4S.getX() - screenPoint.getX()) < 4 && Math.abs(p4S.getY() - screenPoint.getY()) < 4) {
             return sc.s2r(p4S);
-        } else {
-            return null;
-        }
+        } else if (Math.abs(oScreen.getX() - screenPoint.getX()) < 10 && Math.abs(oScreen.getY() - screenPoint.getY()) < 10) {
+            return sc.s2r(oScreen);
+        } else return null;
     }
 
 
